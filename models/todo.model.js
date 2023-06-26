@@ -9,10 +9,9 @@ class Todo {
   }
 
   static async getAllTodos() {
-    const todoDocuments = db.getDb().collection("todos").find().toArray();
-
+    const todoDocuments = await db.getDb().collection("todos").find().toArray();
     return todoDocuments.map((todoDocument) => {
-      return new Todo(todoDocument.text, todoDocument.i_id);
+      return new Todo(todoDocument.text, todoDocument._id);
     });
   }
 
@@ -31,16 +30,15 @@ class Todo {
           }
         );
     } else {
-      return db.getDb().collection("todos").insetOne({ text: this.text });
+      return db.getDb().collection("todos").insertOne({ text: this.text });
     }
   }
 
   delete() {
-    if (this.id) {
+    if (!this.id) {
       throw new Error("Trying to delete todo without id!");
     }
     const todoId = new mongodb.ObjectId(this.id);
-
     return db.getDb().collection("todos").deleteOne({ _id: todoId });
   }
 }
